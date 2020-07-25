@@ -48,9 +48,11 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String CLIENT_ID = "089d841ccc194c10a77afad9e1c11d54";
+    public static final String CLIENT_ID = "fb88aee284ed49e5ac81f13f0dcf4b15";
     public static final int AUTH_TOKEN_REQUEST_CODE = 0x10;
     public static final int AUTH_CODE_REQUEST_CODE = 0x11;
+
+    private static final String REDIRECT_URI = "spotify-sdk://auth";
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private String mAccessToken;
@@ -162,10 +164,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
     private Uri getRedirectUri() {
         return new Uri.Builder()
                 .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
                 .authority(getString(R.string.com_spotify_sdk_redirect_host))
                 .build();
+    }
+     **/
+    private Uri getRedirectUri() {
+        return Uri.parse(REDIRECT_URI);
     }
 }
