@@ -63,8 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setTitle(String.format(
-                Locale.US, "Spotify Auth Sample %s", com.spotify.sdk.android.auth.BuildConfig.VERSION_NAME));
+        getSupportActionBar().setTitle("Digtter");
     }
 
     @Override
@@ -81,10 +80,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        /**
         final Request request = new Request.Builder()
                 .url("https://api.spotify.com/v1/me")
                 .addHeader("Authorization","Bearer " + mAccessToken)
                 .build();
+         **/
+
+        // 最初のアーティストを取得
+        String name = "YOASOBI";
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/search" + "?q=" + name + "&type=artist")
+                .addHeader("Authorization","Bearer " + mAccessToken)
+                .build();
+
+        System.out.println("https://api.spotify.com/v1/search" + "&q=" + name + "&type=artist");
 
         cancelCall();
         mCall = mOkHttpClient.newCall(request);
@@ -164,14 +175,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-    private Uri getRedirectUri() {
-        return new Uri.Builder()
-                .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
-                .authority(getString(R.string.com_spotify_sdk_redirect_host))
-                .build();
-    }
-     **/
     private Uri getRedirectUri() {
         return Uri.parse(REDIRECT_URI);
     }
