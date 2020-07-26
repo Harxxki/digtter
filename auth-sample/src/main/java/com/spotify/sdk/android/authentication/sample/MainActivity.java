@@ -20,7 +20,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private String mAccessCode;
     private Call mCall;
 
-    private List<ArtistData> artistList = new ArrayList<>();
+    private ArrayList<String> artistIdList = new ArrayList<>();
+    private ArrayList<String> artistNameList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,12 +107,13 @@ public class MainActivity extends AppCompatActivity {
                         public void onResponse(Call call, Response response) throws IOException {
                             try {
                                 final JSONObject jsonObject = new JSONObject(response.body().string());
-                                System.out.println(jsonObject.toString(3));
                                 final JSONArray artistsArray = jsonObject.getJSONArray("artists");
                                 for (int i=0; i<artistsArray.length(); i++) {
-                                    ArtistData ad = new ArtistData(artistsArray.getJSONObject(i).getString("id"),artistsArray.getJSONObject(i).getString("name"));
-                                    artistList.add(ad);
+                                    // 同じインデックスに格納していく
+                                    artistIdList.add(artistsArray.getJSONObject(i).getString("id"));
+                                    artistNameList.add(artistsArray.getJSONObject(i).getString("name"));
                                 }
+                                setArtistsView(artistIdList,artistNameList);
                             } catch (JSONException e) {
                                 setResponse("Failed to parse data: " + e);
                             }
@@ -122,15 +123,18 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     setResponse("Failed to parse data: " + e);
                 }
-                setArtistsView(artistList);
             }
 
         });
 
     }
 
-    private void setArtistsView(List<ArtistData> artistList) {
+    private void setArtistsView(ArrayList<String> artistIdList, ArrayList<String> artistNameList) {
+        // 画面遷移
         Intent intent = new Intent(MainActivity.this, ArtistListScrollActivity.class);
+        // 関連アーティストのリストを渡す
+        intent.putStringArrayListExtra("artistIdList", artistIdList);
+        intent.putStringArrayListExtra("artistNameList", artistNameList);
         startActivity(intent);
     }
 
