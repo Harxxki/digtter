@@ -27,6 +27,8 @@ import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -34,11 +36,13 @@ import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -58,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
     private String mAccessToken;
     private String mAccessCode;
     private Call mCall;
+
+    private String firstArtistId;
+    private List<String> artistList = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,25 +87,35 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        /**
-        final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me")
-                .addHeader("Authorization","Bearer " + mAccessToken)
-                .build();
-         **/
-
         // 最初のアーティストを取得
+        // TODO nameをユーザの入力から取得
         String name = "YOASOBI";
 
-        final Request request = new Request.Builder()
+        final Request nameRequest = new Request.Builder()
                 .url("https://api.spotify.com/v1/search" + "?q=" + name + "&type=artist")
                 .addHeader("Authorization","Bearer " + mAccessToken)
                 .build();
 
-        System.out.println("https://api.spotify.com/v1/search" + "&q=" + name + "&type=artist");
-
         cancelCall();
-        mCall = mOkHttpClient.newCall(request);
+        mCall = mOkHttpClient.newCall(nameRequest);
+
+//        mCall.enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                setResponse("Failed to fetch data: " + e);
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                try {
+//                    final JSONObject jsonObject = new JSONObject(response.body().string());
+//                    setResponse(jsonObject.toString(3));
+//                } catch (JSONException e) {
+//                    setResponse("Failed to parse data: " + e);
+//                }
+//            }
+//
+//        });
 
         mCall.enqueue(new Callback() {
             @Override
@@ -110,12 +127,50 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 try {
                     final JSONObject jsonObject = new JSONObject(response.body().string());
-                    setResponse(jsonObject.toString(3));
+                    final JSONObject artistsObject = jsonObject.getJSONObject("artists");
+                    final JSONArray itemsArray = artistsObject.getJSONArray("items");
+                    final JSONObject artistObject = itemsArray.getJSONObject(0);
+                    firstArtistId = artistObject.getString("id");
                 } catch (JSONException e) {
                     setResponse("Failed to parse data: " + e);
                 }
             }
+
         });
+
+        // 関連するアーティスを取得して表示
+        final Request relatedArtistRequest = new Request.Builder()
+                .url("https://api.spotify.com/v1/artists/" + firstArtistId + "/related-artists")
+                .addHeader("Authorization","Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(relatedArtistRequest);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                setResponse("Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    System.out.println(jsonObject.toString(3));
+                    final JSONArray artistsArray = jsonObject.getJSONArray("artists");
+                    for (int i=0; i<artistsArray.length(); i++) {
+                        artistList.add(artistsArray.getJSONObject(i).getString("id"));
+                    }
+                    System.out.println(artistList);
+                } catch (JSONException e) {
+                    setResponse("Failed to parse data: " + e);
+                    System.out.println("Failed to parse data: " + e);
+                }
+            }
+
+        });
+
     }
 
     public void onRequestCodeClicked(View view) {
