@@ -1,24 +1,3 @@
-/*
- * Copyright (c) 2015-2018 Spotify AB
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package com.spotify.sdk.android.authentication.sample;
 
 import android.content.Intent;
@@ -28,7 +7,6 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private String mAccessCode;
     private Call mCall;
 
-    private String firstArtistId;
-    private List<String> artistList = new ArrayList<String>();
+    private List<ArtistData> artistList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,24 +76,6 @@ public class MainActivity extends AppCompatActivity {
         cancelCall();
         mCall = mOkHttpClient.newCall(nameRequest);
 
-//        mCall.enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                setResponse("Failed to fetch data: " + e);
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                try {
-//                    final JSONObject jsonObject = new JSONObject(response.body().string());
-//                    setResponse(jsonObject.toString(3));
-//                } catch (JSONException e) {
-//                    setResponse("Failed to parse data: " + e);
-//                }
-//            }
-//
-//        });
-
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -130,47 +89,49 @@ public class MainActivity extends AppCompatActivity {
                     final JSONObject artistsObject = jsonObject.getJSONObject("artists");
                     final JSONArray itemsArray = artistsObject.getJSONArray("items");
                     final JSONObject artistObject = itemsArray.getJSONObject(0);
-                    firstArtistId = artistObject.getString("id");
+                    final String id = artistObject.getString("id");
+                    // 関連するアーティストを取得する
+                    final Request relatedArtistRequest = new Request.Builder()
+                            .url("https://api.spotify.com/v1/artists/" + id + "/related-artists")
+                            .addHeader("Authorization","Bearer " + mAccessToken)
+                            .build();
+                    cancelCall();
+                    mCall = mOkHttpClient.newCall(relatedArtistRequest);
+                    mCall.enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            setResponse("Failed to fetch data: " + e);
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            try {
+                                final JSONObject jsonObject = new JSONObject(response.body().string());
+                                System.out.println(jsonObject.toString(3));
+                                final JSONArray artistsArray = jsonObject.getJSONArray("artists");
+                                for (int i=0; i<artistsArray.length(); i++) {
+                                    ArtistData ad = new ArtistData(artistsArray.getJSONObject(i).getString("id"),artistsArray.getJSONObject(i).getString("name"));
+                                    artistList.add(ad);
+                                }
+                            } catch (JSONException e) {
+                                setResponse("Failed to parse data: " + e);
+                            }
+                        }
+
+                    });
                 } catch (JSONException e) {
                     setResponse("Failed to parse data: " + e);
                 }
+                setArtistsView(artistList);
             }
 
         });
 
-        // 関連するアーティスを取得して表示
-        final Request relatedArtistRequest = new Request.Builder()
-                .url("https://api.spotify.com/v1/artists/" + firstArtistId + "/related-artists")
-                .addHeader("Authorization","Bearer " + mAccessToken)
-                .build();
+    }
 
-        cancelCall();
-        mCall = mOkHttpClient.newCall(relatedArtistRequest);
-
-        mCall.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                setResponse("Failed to fetch data: " + e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-                    System.out.println(jsonObject.toString(3));
-                    final JSONArray artistsArray = jsonObject.getJSONArray("artists");
-                    for (int i=0; i<artistsArray.length(); i++) {
-                        artistList.add(artistsArray.getJSONObject(i).getString("id"));
-                    }
-                    System.out.println(artistList);
-                } catch (JSONException e) {
-                    setResponse("Failed to parse data: " + e);
-                    System.out.println("Failed to parse data: " + e);
-                }
-            }
-
-        });
-
+    private void setArtistsView(List<ArtistData> artistList) {
+        Intent intent = new Intent(MainActivity.this, ArtistListScrollActivity.class);
+        startActivity(intent);
     }
 
     public void onRequestCodeClicked(View view) {
