@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ArtistListScrollActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class FirstArtistListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     ArrayList<String> artistIdList = new ArrayList<>();
     ArrayList<String> artistNameList = new ArrayList<>();
@@ -22,7 +22,7 @@ public class ArtistListScrollActivity extends AppCompatActivity implements Adapt
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scroll_list_artist);
+        setContentView(R.layout.activity_artist_list_first);
 
         Intent intent = getIntent();
         artistIdList = intent.getStringArrayListExtra("artistIdList");
@@ -60,13 +60,13 @@ public class ArtistListScrollActivity extends AppCompatActivity implements Adapt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this.getApplicationContext(), MainActivity.class);
+        Intent intent = new Intent(this.getApplicationContext(), ArtistListActivity.class);
         // clickされたpositionのtextとphotoのID
         String selectedId = artistIdList.get(position);
         String selectedName = artistNameList.get(position);
         // インテントにセット
         intent.putExtra("id", selectedId);
-        intent.putExtra("name", artistNameList);
+        intent.putExtra("name", selectedName);
         // Activity をスイッチする
         startActivity(intent);
     }

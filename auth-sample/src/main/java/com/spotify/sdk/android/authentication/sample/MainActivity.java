@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "spotify-sdk://auth";
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
+
     private String mAccessToken;
     private String mAccessCode;
     private Call mCall;
@@ -63,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
             snackbar.show();
             return;
         }
+
+        // TODO UIを整える
+        // TODO ボタンのラベルを変える
 
         // 最初のアーティストを取得
         // TODO nameをユーザの入力から取得
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setArtistsView(ArrayList<String> artistIdList, ArrayList<String> artistNameList) {
         // 画面遷移
-        Intent intent = new Intent(MainActivity.this, ArtistListScrollActivity.class);
+        Intent intent = new Intent(MainActivity.this, FirstArtistListActivity.class);
         // 関連アーティストのリストを渡す
         intent.putStringArrayListExtra("artistIdList", artistIdList);
         intent.putStringArrayListExtra("artistNameList", artistNameList);
