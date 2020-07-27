@@ -33,15 +33,14 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
 
         System.out.println("画面遷移しました -> FirstArtistActivity");
         String tmp = intent.getStringExtra("from");
-        if (intent.getStringExtra("from").equals("MainActivity")){
-            getSupportActionBar().setTitle("Artists related to " + MainActivity.selectedArtistName);
-        }else if (intent.getStringExtra("from").equals("ListActivity")){
-            getSupportActionBar().setTitle("Artists related to " + ArtistListActivity.selectedArtistName);
+        if ("MainActivity".equals(intent.getStringExtra("from"))){
+            getSupportActionBar().setTitle("Artists related to " + MainActivity.selectedName);
+        }else if ("ListActivity".equals(intent.getStringExtra("from"))){
+            getSupportActionBar().setTitle("Artists related to " + ArtistListActivity.selectedName);
         }else{
             final Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_alf), "遷移元のActivityが不明です", Snackbar.LENGTH_SHORT);
             snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
             snackbar.show();
-            return;
         }
 
         // Adapter生成

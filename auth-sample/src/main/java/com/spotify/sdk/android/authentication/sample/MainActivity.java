@@ -7,6 +7,8 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,6 +29,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static org.junit.Assert.*;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String CLIENT_ID = "fb88aee284ed49e5ac81f13f0dcf4b15";
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> artistIdList = new ArrayList<>();
     private ArrayList<String> artistNameList = new ArrayList<>();
 
-    public static String selectedArtistName;
+    public static String selectedName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
 
         // 最初のアーティストを取得
         // TODO nameをユーザの入力から取得
-        selectedArtistName = "YOASOBI";
+        this.selectedName = "YOASOBI";
 
         final Request nameRequest = new Request.Builder()
-                .url("https://api.spotify.com/v1/search" + "?q=" + selectedArtistName + "&type=artist")
+                .url("https://api.spotify.com/v1/search" + "?q=" + selectedName + "&type=artist")
                 .addHeader("Authorization","Bearer " + mAccessToken)
                 .build();
 
@@ -121,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                                     artistNameList.add(artistsArray.getJSONObject(i).getString("name"));
                                 }
                                 setArtistsView(artistIdList,artistNameList);
+                                System.out.println("setArtistsViewを呼び出しました");
                             } catch (JSONException e) {
                                 setResponse("Failed to parse data: " + e);
                             }
@@ -131,19 +136,12 @@ public class MainActivity extends AppCompatActivity {
                     setResponse("Failed to parse data: " + e);
                 }
             }
-
         });
 
     }
 
     private void setArtistsView(ArrayList<String> artistIdList, ArrayList<String> artistNameList) {
-        // 画面遷移
-        Intent intent = new Intent(MainActivity.this, FirstArtistListActivity.class);
-        // 関連アーティストのリストを渡す
-        intent.putStringArrayListExtra("artistIdList", artistIdList);
-        intent.putStringArrayListExtra("artistNameList", artistNameList);
-        intent.putExtra("from","MainActivity");
-        startActivity(intent);
+        myHandler(artistIdList, artistNameList);
     }
 
     public void onRequestCodeClicked(View view) {
@@ -205,5 +203,28 @@ public class MainActivity extends AppCompatActivity {
 
     private Uri getRedirectUri() {
         return Uri.parse(REDIRECT_URI);
+    }
+
+    public void myHandler(ArrayList<String> artistIdList, ArrayList<String> artistNameList) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 画面遷移
+                        Intent intent = new Intent(MainActivity.this, FirstArtistListActivity.class);
+                        // 関連アーティストのリストを渡す
+                        intent.putStringArrayListExtra("artistIdList", artistIdList);
+                        intent.putStringArrayListExtra("artistNameList", artistNameList);
+                        intent.putExtra("from","MainActivity");
+                        startActivity(intent);
+                        assertEquals(getMainLooper().getThread(), Thread.currentThread());
+                    }
+                });
+            }
+        }).start();
     }
 }

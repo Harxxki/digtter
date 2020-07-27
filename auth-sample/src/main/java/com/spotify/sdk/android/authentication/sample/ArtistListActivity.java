@@ -26,9 +26,9 @@ import okhttp3.Response;
 
 public class ArtistListActivity extends AppCompatActivity {
 
-    private String id;
-    // private String selectedArtistName;
-    public static String selectedArtistName;
+    private String selectedId;
+    // private String selectedName;
+    public static String selectedName;
     private String mAccessToken;
     private Call mCall;
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
@@ -43,11 +43,11 @@ public class ArtistListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_artist_list);
 
         Intent intent = getIntent();
-        id = intent.getStringExtra("id");
-        selectedArtistName = intent.getStringExtra("name");
-        getSupportActionBar().setTitle("Searching : related to '" + selectedArtistName + "'");
+        selectedId = intent.getStringExtra("id");
+        selectedName = intent.getStringExtra("name");
+        getSupportActionBar().setTitle("Searching : related to '" + selectedName + "'");
 
-        System.out.println("次のアーティストが選択されました : " + selectedArtistName + " (id = " + id + ")");
+        System.out.println("次のアーティストが選択されました : " + selectedName + " (id = " + selectedId + ")");
         System.out.println("画面遷移しました -> ArtistActivity");
 
         this.mAccessToken = MainActivity.mAccessToken;
@@ -58,10 +58,13 @@ public class ArtistListActivity extends AppCompatActivity {
             snackbar.show();
             return;
         }
+    }
 
+    protected void onStart() {
+        super.onStart();
         // 関連するアーティストを取得する
         final Request relatedArtistRequest = new Request.Builder()
-                .url("https://api.spotify.com/v1/artists/" + id + "/related-artists")
+                .url("https://api.spotify.com/v1/artists/" + selectedId + "/related-artists")
                 .addHeader("Authorization","Bearer " + mAccessToken)
                 .build();
         cancelCall();
@@ -90,10 +93,9 @@ public class ArtistListActivity extends AppCompatActivity {
 
         });
     }
-
     private void setArtistsView(ArrayList<String> artistIdList, ArrayList<String> artistNameList) {
         // 画面遷移
-        Intent intent = new Intent(ArtistListActivity.this, ArtistListActivity.class);
+        Intent intent = new Intent(ArtistListActivity.this, FirstArtistListActivity.class);
         // 関連アーティストのリストを渡す
         intent.putStringArrayListExtra("artistIdList", artistIdList);
         intent.putStringArrayListExtra("artistNameList", artistNameList);
