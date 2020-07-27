@@ -35,12 +35,15 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
         String tmp = intent.getStringExtra("from");
         if ("MainActivity".equals(intent.getStringExtra("from"))){
             getSupportActionBar().setTitle("Artists related to " + MainActivity.selectedName);
+            System.out.println("Artists related to " + MainActivity.selectedName + "from MainActivity");
         }else if ("ListActivity".equals(intent.getStringExtra("from"))){
             getSupportActionBar().setTitle("Artists related to " + ArtistListActivity.selectedName);
+            System.out.println("Artists related to " + ArtistListActivity.selectedName + "from ArtistListActivity");
         }else{
             final Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_alf), "遷移元のActivityが不明です", Snackbar.LENGTH_SHORT);
             snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
             snackbar.show();
+            System.out.println("遷移元のActivityが不明です");
         }
 
         // Adapter生成
@@ -71,9 +74,10 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this.getApplicationContext(), FirstArtistListActivity.class);
         String selectedId = artistIdList.get(position);
         String selectedName = artistNameList.get(position);
+        // インテント作成
+        Intent intent = new Intent(this.getApplicationContext(), ArtistListActivity.class);
         // インテントにセット
         intent.putExtra("id", selectedId);
         intent.putExtra("name", selectedName);
