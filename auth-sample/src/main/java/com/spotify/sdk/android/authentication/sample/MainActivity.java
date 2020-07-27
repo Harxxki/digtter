@@ -37,12 +37,15 @@ public class MainActivity extends AppCompatActivity {
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
 
-    private String mAccessToken;
+    // private String mAccessToken;
+    public static String mAccessToken;
     private String mAccessCode;
     private Call mCall;
 
     private ArrayList<String> artistIdList = new ArrayList<>();
     private ArrayList<String> artistNameList = new ArrayList<>();
+
+    public static String selectedArtistName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
         // 最初のアーティストを取得
         // TODO nameをユーザの入力から取得
-        String name = "YOASOBI";
+        selectedArtistName = "YOASOBI";
 
         final Request nameRequest = new Request.Builder()
-                .url("https://api.spotify.com/v1/search" + "?q=" + name + "&type=artist")
+                .url("https://api.spotify.com/v1/search" + "?q=" + selectedArtistName + "&type=artist")
                 .addHeader("Authorization","Bearer " + mAccessToken)
                 .build();
 
@@ -139,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         // 関連アーティストのリストを渡す
         intent.putStringArrayListExtra("artistIdList", artistIdList);
         intent.putStringArrayListExtra("artistNameList", artistNameList);
+        intent.putExtra("from","MainActivity");
         startActivity(intent);
     }
 

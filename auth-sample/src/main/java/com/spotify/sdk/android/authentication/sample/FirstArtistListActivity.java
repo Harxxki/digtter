@@ -9,6 +9,9 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +31,19 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
         artistIdList = intent.getStringArrayListExtra("artistIdList");
         artistNameList = intent.getStringArrayListExtra("artistNameList");
 
+        System.out.println("画面遷移しました -> FirstArtistActivity");
+        String tmp = intent.getStringExtra("from");
+        if (intent.getStringExtra("from").equals("MainActivity")){
+            getSupportActionBar().setTitle("Artists related to " + MainActivity.selectedArtistName);
+        }else if (intent.getStringExtra("from").equals("ListActivity")){
+            getSupportActionBar().setTitle("Artists related to " + ArtistListActivity.selectedArtistName);
+        }else{
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_alf), "遷移元のActivityが不明です", Snackbar.LENGTH_SHORT);
+            snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+            snackbar.show();
+            return;
+        }
+
         // Adapter生成
         SimpleAdapter simpleAdapter = new SimpleAdapter(this,
                 getListData(artistIdList, artistNameList), // 使用するデータ
@@ -40,10 +56,6 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
         ListView listView = (ListView) findViewById(R.id.artist_list);
         listView.setAdapter(simpleAdapter);
 
-        System.out.println("画面遷移しました");
-        System.out.println(getListData(artistIdList, artistNameList));
-
-        // TODO:リスト項目をクリックした時の処理
         listView.setOnItemClickListener(this);
     }
 
@@ -60,8 +72,7 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this.getApplicationContext(), ArtistListActivity.class);
-        // clickされたpositionのtextとphotoのID
+        Intent intent = new Intent(this.getApplicationContext(), FirstArtistListActivity.class);
         String selectedId = artistIdList.get(position);
         String selectedName = artistNameList.get(position);
         // インテントにセット
