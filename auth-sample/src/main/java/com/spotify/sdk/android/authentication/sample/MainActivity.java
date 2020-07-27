@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.spotify.sdk.android.auth.AuthorizationClient;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> artistNameList = new ArrayList<>();
 
     public static String selectedName;
+    private EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +74,15 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        artistIdList.clear();
+        artistNameList.clear();
+
         // TODO UIを整える
-        // TODO ボタンのラベルを変える
 
         // 最初のアーティストを取得
-        // TODO nameをユーザの入力から取得
-        this.selectedName = "YOASOBI";
+        editText = findViewById(R.id.edit_text);
+        selectedName = editText.getText().toString();
+
 
         final Request nameRequest = new Request.Builder()
                 .url("https://api.spotify.com/v1/search" + "?q=" + selectedName + "&type=artist")
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                setResponse("Failed to fetch data: " + e);
+                System.out.println("Failed to fetch data: " + e);
             }
 
             @Override
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     mCall.enqueue(new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
-                            setResponse("Failed to fetch data: " + e);
+                            System.out.println("Failed to fetch data: " + e);
                         }
 
                         @Override
@@ -127,13 +132,13 @@ public class MainActivity extends AppCompatActivity {
                                 setArtistsView(artistIdList,artistNameList);
                                 System.out.println("setArtistsViewを呼び出しました");
                             } catch (JSONException e) {
-                                setResponse("Failed to parse data: " + e);
+                                System.out.println("Failed to parse data: " + e);
                             }
                         }
 
                     });
                 } catch (JSONException e) {
-                    setResponse("Failed to parse data: " + e);
+                    System.out.println("Failed to parse data: " + e);
                 }
             }
         });
@@ -167,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         final AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, data);
         if (response.getError() != null && !response.getError().isEmpty()) {
-            setResponse(response.getError());
+            System.out.println(response.getError());
         }
         if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
             mAccessToken = response.getAccessToken();
@@ -176,13 +181,6 @@ public class MainActivity extends AppCompatActivity {
             mAccessCode = response.getCode();
             updateCodeView();
         }
-    }
-
-    private void setResponse(final String text) {
-        runOnUiThread(() -> {
-            final TextView responseView = findViewById(R.id.response_text_view);
-            responseView.setText(text);
-        });
     }
 
     private void updateTokenView() {

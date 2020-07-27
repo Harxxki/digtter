@@ -2,11 +2,15 @@ package com.spotify.sdk.android.authentication.sample;
 
 import android.R.id;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -17,10 +21,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.util.TypedValue.COMPLEX_UNIT_DIP;
+
 public class FirstArtistListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     ArrayList<String> artistIdList = new ArrayList<>();
     ArrayList<String> artistNameList = new ArrayList<>();
+
+    // TODO バックボタンで前の選択画面のActivityに戻る
+    // TODO ArtistListActivityを統合する
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +58,17 @@ public class FirstArtistListActivity extends AppCompatActivity implements Adapte
         // Adapter生成
         SimpleAdapter simpleAdapter = new SimpleAdapter(this,
                 getListData(artistIdList, artistNameList), // 使用するデータ
-                android.R.layout.simple_list_item_2, // 使用するレイアウト
+                android.R.layout.simple_list_item_1, // 使用するレイアウト
                 new String[]{"name", "id"}, // どの項目を
                 new int[]{id.text1, id.text2} // どのidの項目に入れるか
         );
 
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, artistNameList);
+
         // ListViewを取得
         ListView listView = (ListView) findViewById(R.id.artist_list);
-        listView.setAdapter(simpleAdapter);
+        //listView.setAdapter(simpleAdapter);
+        listView.setAdapter(arrayAdapter);
 
         listView.setOnItemClickListener(this);
     }

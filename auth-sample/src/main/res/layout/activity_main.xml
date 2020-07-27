@@ -36,52 +36,46 @@
             android:id="@+id/token_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             tools:text="Token: 089d841ccc194c10a77afad9e1c11d54" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             android:onClick="onRequestTokenClicked"
-            android:text="Request Token" />
+            android:text="@string/request_token" />
 
         <TextView
             android:id="@+id/code_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             tools:text="Code: 089d841ccc194c10a77afad9e1c11d54" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             android:onClick="onRequestCodeClicked"
-            android:text="Request Code" />
+            android:text="@string/request_code" />
 
-        <ScrollView
+        <EditText
+            android:id="@+id/edit_text"
+            android:hint="@string/hint"
+            android:autofillHints="@string/hint"
+            android:inputType="text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/response_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="10sp"
-                tools:text="Line 1\nLine 2\nLine 3" />
-
-        </ScrollView>
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp" />
 
         <Button
             android:id="@+id/button3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             android:onClick="onGetUserProfileClicked"
-            android:text="Get User Profile" />
+            android:text="@string/get_related_artist" />
 
     </LinearLayout>
 

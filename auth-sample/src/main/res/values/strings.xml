@@ -5,4 +5,8 @@
     <string name="token">Access Token: %1$s</string>
     <string name="title_activity_scroll_list_artist">Related Artists</string>
     <string name="title_activity_artist_data">Artist Data</string>
+    <string name="hint">Enter artist (ex.「Muse」) …</string>
+    <string name="get_related_artist">3. Get Related Artist!</string>
+    <string name="request_token">1. Request Token</string>
+    <string name="request_code">2. Request Code</string>
 </resources>
