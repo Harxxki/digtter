@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
 
-    // private String mAccessToken;
     public static String mAccessToken;
     private String mAccessCode;
     private Call mCall;
